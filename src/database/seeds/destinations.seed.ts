@@ -52,7 +52,7 @@ async function main() {
       .execute();
 
     console.log(
-      `Seed destinations: create ${result.raw.length} new, sklip ${PROVINCES.length - result.raw.length}.`,
+      `Seed destinations: create ${result.raw.length} new, skip ${PROVINCES.length - result.raw.length}.`,
     );
   } finally {
     await dataSource.destroy();

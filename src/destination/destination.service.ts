@@ -7,18 +7,18 @@ import { Repository } from 'typeorm';
 export class DestinationService {
   constructor(
     @InjectRepository(Destination)
-    private readonly destionations: Repository<Destination>,
+    private readonly destinations: Repository<Destination>,
   ) {}
 
   findAllActive(): Promise<Destination[]> {
-    return this.destionations.find({
+    return this.destinations.find({
       where: { isActive: true },
       order: { name: 'ASC' },
     });
   }
 
   async findActiveByCode(code: string): Promise<Destination> {
-    const destination = await this.destionations.findOne({
+    const destination = await this.destinations.findOne({
       where: { code, isActive: true },
       relations: { images: true },
       order: { images: { sortOrder: 'ASC', id: 'ASC' } },
@@ -27,6 +27,4 @@ export class DestinationService {
       throw new NotFoundException(`Destination "${code}" not found`);
     return destination;
   }
-
-  
 }
