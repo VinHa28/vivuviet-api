@@ -9,6 +9,11 @@ async function bootstrap() {
     instrument: ObserveInstrument,
   });
 
+  const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:3001')
+    .split(',')
+    .map((origin) => origin.trim());
+  app.enableCors({ origin: corsOrigins, credentials: true });
+
   app.setGlobalPrefix('api/v1');
   app.useGlobalFilters(new ProblemDetailsFilter());
   app.useGlobalPipes(
@@ -24,7 +29,7 @@ async function bootstrap() {
     .setDescription('REST API of ViVuViet V2')
     .setVersion('1.0')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
