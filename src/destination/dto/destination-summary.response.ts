@@ -1,9 +1,17 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Destination } from "../destination.entity.js";
 
 export class DestinationSummaryResponse {
+    @ApiProperty({example: 'ha-noi'})
     code:string;
+
+    @ApiProperty({example: 'Hà Nội'})
     name: string;
+
+    @ApiProperty({type: String, nullable: true})
     shortDescription: string | null;
+
+    @ApiProperty({type: String, nullable: true})
     bannerUrl: string | null;
 
     static from(destination: Destination): DestinationSummaryResponse {
