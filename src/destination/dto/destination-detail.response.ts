@@ -8,6 +8,12 @@ export class DestinationDetailResponse {
   @ApiProperty({ example: 'Phú Quốc' })
   name: string;
 
+  @ApiProperty({ example: 'an-giang' })
+  provinceCode: string;
+
+  @ApiProperty({ example: 'An Giang' })
+  provinceName: string;
+
   @ApiProperty({ type: String, nullable: true })
   shortDescription: string | null;
 
@@ -18,6 +24,8 @@ export class DestinationDetailResponse {
     const response = new DestinationDetailResponse();
     response.slug = destination.slug;
     response.name = destination.name;
+    response.provinceCode = destination.province.code;
+    response.provinceName = destination.province.name;
     response.shortDescription = destination.shortDescription;
     response.bannerUrl = destination.bannerUrl;
     return response;

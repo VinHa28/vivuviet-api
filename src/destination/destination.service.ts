@@ -9,18 +9,30 @@ export class DestinationService {
   constructor(
     @InjectRepository(Destination)
     private readonly destinations: Repository<Destination>,
-  ) { }
+  ) {}
 
-  findAllPublished(): Promise<Destination[]> {
+  findAllPublished(provinceCode?: string): Promise<Destination[]> {
     return this.destinations.find({
-      where: { status: DestinationStatus.PUBLISHED },
+      where: {
+        status: DestinationStatus.PUBLISHED,
+        province: {
+          isActive: true,
+          ...(provinceCode && { code: provinceCode }),
+        },
+      },
+      relations: { province: true },
       order: { name: 'ASC' },
     });
   }
 
   async findPublishedBySlug(slug: string): Promise<Destination> {
     const destination = await this.destinations.findOne({
-      where: { slug, status: DestinationStatus.PUBLISHED },
+      where: {
+        slug,
+        status: DestinationStatus.PUBLISHED,
+        province: { isActive: true },
+      },
+      relations: { province: true },
     });
     if (!destination)
       throw new NotFoundException(`Destination "${slug}" not found`);
