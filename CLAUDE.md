@@ -29,7 +29,7 @@ npm run test:e2e                 # vitest with vitest.config.e2e.ts
 npm run migration:generate -- src/database/migrations/Name   # builds first, diffs entities vs DB
 npm run migration:run            # builds first, applies pending migrations
 npm run migration:revert
-npm run seed                     # builds first; inserts the 34 provinces, idempotent (.orIgnore())
+npm run seed                     # builds first; upserts 34 provinces and 4 sample destinations in one transaction, idempotent
 ```
 
 API is mounted at `http://localhost:3000/api/v1`; Swagger UI at `http://localhost:3000/api/docs` (JSON at `/api/docs-json`, outside the `api/v1` prefix).
@@ -57,7 +57,8 @@ src/
 │  ├─ data-source.ts          # TypeORM CLI DataSource, loads entities and migrations from dist/
 │  ├─ migrations/             # generated, then read and committed
 │  └─ seeds/                  # destinations.seed.ts
-└─ destination/               # entity, service, public controller, dto/*.response.ts
+├─ province/                  # reference data: entity, service, public controller, dto/*.response.ts
+└─ destination/               # tourism content: entity, status enum, service, public controller, dto/
 docs/
 ├─ domain.md                  # business rules (source of truth)
 ├─ postman/                   # exported Postman collection (baseUrl variable)
@@ -69,6 +70,7 @@ docs/
 - Layering is Controller → Service → `Repository<Entity>` injected with `@InjectRepository`. No hand-written repository layer.
 - Never return entities from a controller. Map to response DTOs with a static `from()`.
 - `ValidationPipe` is global with `whitelist`, `forbidNonWhitelisted`, `transform`. Map DTO fields onto entities explicitly; never `Object.assign(entity, dto)` or spread a body into `save`.
+- Data model: `provinces` (reference data, unique `code`, `isActive`) 1-N `destinations` (`provinceId` FK `ON DELETE RESTRICT`, unique `slug`, `status` DRAFT | PUBLISHED, default DRAFT). Public endpoints show only PUBLISHED destinations whose province is active. Destination images were dropped and are to be redone.
 - Status changes go through dedicated endpoints (`/approve`, `/reject`), never a generic status PATCH. State-machine rules go in pure `*.policy.ts` functions so they can be unit tested without a database.
 - Each role gets its own controller: `public-*`, `partner-*`, `admin-*`.
 - Errors come from `ProblemDetailsFilter`: `HttpException` keeps its status, `EntityNotFoundError` becomes 404, PostgreSQL `23505` becomes 409, anything else 500. Success responses return data directly, with no `{ success, data }` wrapper.
@@ -83,10 +85,13 @@ docs/
 - Never use `synchronize: true` to "fix" a missing table; generate a migration.
 - `src/app.module.ts` wires `@nestjs/observe` with placeholder keys (`YOUR_APP_KEY`). It came from the Nest CLI prompt and is not part of the design.
 - The scaffold `AppController` (`GET /api/v1`) and `app.controller.spec.ts` are leftovers. Remove them once a real test replaces the spec.
+- To load a relation onto the entity with `QueryBuilder`, use `leftJoinAndSelect`. Plain `leftJoin` only joins in SQL, so the property stays `undefined` and the response DTO crashes at runtime while the build stays green. Put filter conditions on the joined table in the join's `ON` (third argument), not in `WHERE`, or parents with no matching child disappear.
 - `problem-details.filters.ts` is plural and `instance` in the filter uses `req.path`; both are known, optional clean-ups.
 
 ## Status
 
-Done: Destination module (list and detail), init migration, seed of 34 provinces, Problem Details filter, Swagger UI, Postman collection.
+Done: Province and Destination split (`GET /provinces`, `GET /provinces/:code`, `GET /destinations?province=<code>`, `GET /destinations/:slug`), DRAFT | PUBLISHED status, single `Init` migration, transactional seed, Problem Details filter, Swagger UI, Postman collection.
+
+Owed: destination images; frontend restructure (map reads `/provinces`, province page, `/destinations/[slug]`), the map is broken against the new shape until then.
 
 Open: `compose.yaml` is written and syntax-checked but has never been run (Docker Desktop did not start on the user's machine). Verify with `docker compose up -d`, then `migration:run` and `seed` on the empty database before writing e2e tests. Next: connect the V2 API to the frontend, then Chặng 2 (Auth).
