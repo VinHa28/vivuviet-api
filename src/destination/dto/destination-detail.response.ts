@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Destination } from '../destination.entity.js';
+import { Destination } from '../entities/destination.entity.js';
 
 export class DestinationDetailResponse {
   @ApiProperty({ example: 'phu-quoc' })

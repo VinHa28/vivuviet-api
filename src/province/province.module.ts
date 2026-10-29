@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Province } from './province.entity.js';
+import { Province } from './entities/province.entity.js';
 import { ProvinceService } from './province.service.js';
 import { PublicProvincesController } from './public-provinces.controller.js';
 

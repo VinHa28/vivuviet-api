@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Province } from "../province.entity.js";
+import { Province } from '../entities/province.entity.js';
 
 export class ProvinceSummaryResponse {
     @ApiProperty({ example: 'ha-noi' })

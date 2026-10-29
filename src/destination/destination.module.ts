@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Destination } from './destination.entity.js';
+import { Destination } from './entities/destination.entity.js';
 import { DestinationService } from './destination.service.js';
 import { PublicDestinationsController } from './public-destinations.controller.js';
 

@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Destination } from './destination.entity.js';
-import { DestinationStatus } from './destination-status.enum.js';
+import { Destination } from './entities/destination.entity.js';
+import { DestinationStatus } from './enums/destination-status.enum.js';
 
 @Injectable()
 export class DestinationService {

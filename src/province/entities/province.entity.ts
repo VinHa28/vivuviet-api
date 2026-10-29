@@ -7,7 +7,7 @@ import {
     type Relation,
     UpdateDateColumn,
 } from 'typeorm';
-import { Destination } from '../destination/destination.entity.js';
+import { Destination } from '../../destination/entities/destination.entity.js';
 
 @Entity('provinces')
 export class Province {

@@ -1,6 +1,6 @@
-import { DestinationStatus } from '../../destination/destination-status.enum.js';
-import { Destination } from '../../destination/destination.entity.js';
-import { Province } from '../../province/province.entity.js';
+import { DestinationStatus } from '../../destination/enums/destination-status.enum.js';
+import { Destination } from '../../destination/entities/destination.entity.js';
+import { Province } from '../../province/entities/province.entity.js';
 import dataSource from '../data-source.js';
 
 const PROVINCES = [

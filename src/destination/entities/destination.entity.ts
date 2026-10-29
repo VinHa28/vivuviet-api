@@ -8,8 +8,8 @@ import {
   type Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { Province } from '../province/province.entity.js';
-import { DestinationStatus } from './destination-status.enum.js';
+import { Province } from '../../province/entities/province.entity.js';
+import { DestinationStatus } from '../enums/destination-status.enum.js';
 
 @Entity('destinations')
 export class Destination {
