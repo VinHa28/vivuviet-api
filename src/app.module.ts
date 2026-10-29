@@ -5,6 +5,7 @@ import { AppService } from './app.service.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DestinationModule } from './destination/destination.module.js';
+import { ProvinceModule } from './province/province.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -26,8 +27,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       serviceId: 'vivuviet-api',
     }),
     DestinationModule,
+    ProvinceModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -2,23 +2,32 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   type Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { DestinationImage } from './destination-image.entity.js';
+import { Province } from '../province/province.entity.js';
+import { DestinationStatus } from './destination-status.enum.js';
 
 @Entity('destinations')
 export class Destination {
-  @OneToMany(() => DestinationImage, (image) => image.destination)
-  images: Relation<DestinationImage[]>;
-  
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ name: 'province_id' })
+  provinceId: number;
+
+  @ManyToOne(() => Province, (province) => province.destinations, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'province_id' })
+  province: Relation<Province>;
+
   @Column({ type: 'varchar', length: 100, unique: true })
-  code: string;
+  slug: string;
 
   @Column({ type: 'varchar', length: 100 })
   name: string;
@@ -29,8 +38,12 @@ export class Destination {
   @Column({ type: 'varchar', length: 500, name: 'banner_url', nullable: true })
   bannerUrl: string | null;
 
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean;
+  @Column({
+    type: 'enum',
+    enum: DestinationStatus,
+    default: DestinationStatus.DRAFT,
+  })
+  status: DestinationStatus;
 
   @CreateDateColumn({ type: 'timestamptz', precision: 3, name: 'created_at' })
   createdAt: Date;

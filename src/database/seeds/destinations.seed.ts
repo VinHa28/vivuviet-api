@@ -1,4 +1,6 @@
+import { DestinationStatus } from '../../destination/destination-status.enum.js';
 import { Destination } from '../../destination/destination.entity.js';
+import { Province } from '../../province/province.entity.js';
 import dataSource from '../data-source.js';
 
 const PROVINCES = [
@@ -207,25 +209,90 @@ const PROVINCES = [
   },
 ];
 
+const DESTINATIONS = [
+  {
+    provinceCode: 'an-giang',
+    slug: 'phu-quoc',
+    name: 'Phú Quốc',
+    shortDescription:
+      'Đảo ngọc với bãi biển trong xanh, rừng nguyên sinh và hải sản tươi ngon.',
+  },
+  {
+    provinceCode: 'quang-ninh',
+    slug: 'ha-long',
+    name: 'Hạ Long',
+    shortDescription:
+      'Di sản thiên nhiên thế giới với hàng nghìn đảo đá vôi giữa vịnh biển xanh ngọc.',
+  },
+  {
+    provinceCode: 'lao-cai',
+    slug: 'sa-pa',
+    name: 'Sa Pa',
+    shortDescription:
+      'Thị trấn trong sương với ruộng bậc thang, đỉnh Fansipan và bản làng người dân tộc.',
+  },
+  {
+    provinceCode: 'da-nang',
+    slug: 'hoi-an',
+    name: 'Hội An',
+    shortDescription:
+      'Phố cổ đèn lồng ven sông Hoài, nơi lưu giữ kiến trúc và ẩm thực truyền thống miền Trung.',
+  },
+];
+
 async function main() {
   await dataSource.initialize();
 
   try {
-    const result = await dataSource
-      .createQueryBuilder()
-      .insert()
-      .into(Destination)
-      .values(PROVINCES)
-      .orUpdate(['name', 'short_description'], ['code'], {
-        skipUpdateIfNoValuesChanged: true,
-      })
-      .returning('id')
-      .execute();
+    await dataSource.transaction(async (manager) => {
+      const provinceResult = await manager
+        .createQueryBuilder()
+        .insert()
+        .into(Province)
+        .values(PROVINCES)
+        .orUpdate(['name', 'short_description'], ['code'], {
+          skipUpdateIfNoValuesChanged: true,
+        })
+        .returning('id')
+        .execute();
 
-    const changed = result.raw.length;
-    console.log(
-      `Seed destinations: ${changed} inserted or updated, ${PROVINCES.length - changed} unchanged.`,
-    );
+      const provinces = await manager.find(Province, {
+        select: { id: true, code: true },
+      });
+      const provinceIdByCode = new Map(provinces.map((p) => [p.code, p.id]));
+
+      const destinationRows = DESTINATIONS.map((d) => {
+        const provinceId = provinceIdByCode.get(d.provinceCode);
+        if (provinceId === undefined) {
+          throw new Error(`Unknown province code "${d.provinceCode}"`);
+        }
+        return {
+          provinceId,
+          slug: d.slug,
+          name: d.name,
+          shortDescription: d.shortDescription,
+          status: DestinationStatus.PUBLISHED,
+        };
+      });
+
+      const destinationResult = await manager
+        .createQueryBuilder()
+        .insert()
+        .into(Destination)
+        .values(destinationRows)
+        .orUpdate(['province_id', 'name', 'short_description'], ['slug'], {
+          skipUpdateIfNoValuesChanged: true,
+        })
+        .returning('id')
+        .execute();
+
+      console.log(
+        `Seed provinces: ${provinceResult.raw.length} inserted or updated, ${PROVINCES.length - provinceResult.raw.length} unchanged.`,
+      );
+      console.log(
+        `Seed destinations: ${destinationResult.raw.length} inserted or updated, ${DESTINATIONS.length - destinationResult.raw.length} unchanged.`,
+      );
+    });
   } finally {
     await dataSource.destroy();
   }

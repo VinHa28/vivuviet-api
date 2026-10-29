@@ -39,14 +39,14 @@
           "response": []
         },
         {
-          "name": "getDestinationByCode",
+          "name": "getDestinationBySlug",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 200\", function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Specifically for Hanoi city, there is an 'images' section.\", function () {\r\n  const body = pm.response.json();\r\n  pm.expect(body.code).to.eql(\"ha-noi\");\r\n  pm.expect(body.name).to.eql(\"Hà Nội\");\r\n  pm.expect(body.images).to.be.an(\"array\");\r\n});"
+                  "pm.test(\"Status 200\", function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Đảo ngọc với bãi biển trong xanh, rừng nguyên sinh và hải sản tươi ngon.\", function () {\r\n  const body = pm.response.json();\r\n  pm.expect(body.slug).to.eql(\"phu-quoc\");\r\n  pm.expect(body.name).to.eql(\"Phú Quốc\");\r\n});"
                 ]
               }
             }
@@ -55,13 +55,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/destinations/ha-noi",
+              "raw": "{{baseUrl}}/destinations/phu-quoc",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "destinations",
-                "ha-noi"
+                "phu-quoc"
               ]
             }
           },
@@ -95,6 +95,69 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "getDestinationsByProvince",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/destinations?province=quang-ninh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destinations"
+              ],
+              "query": [
+                {
+                  "key": "province",
+                  "value": "quang-ninh"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "public-provinces",
+      "item": [
+        {
+          "name": "getAllProvinces",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/provinces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "provinces"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getProvinceByCode",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/provinces/an-giang",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "provinces",
+                "an-giang"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }
@@ -102,7 +165,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000/api/v1"
+      "value": ""
     }
   ]
 }
